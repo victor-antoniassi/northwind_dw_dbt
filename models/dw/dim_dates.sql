@@ -6,7 +6,8 @@
     )
 }}
 
-WITH date_bounds AS (
+WITH 
+date_bounds AS (
     -- Encontra o intervalo de datas necessário
     SELECT
         MIN(order_date) as min_date,
@@ -15,12 +16,12 @@ WITH date_bounds AS (
 ),
 
 date_sequence AS (
-    -- Gera sequência de datas
-    SELECT DATEADD(DAY, seq, min_date) as date
-    FROM date_bounds,
-        (SELECT ROW_NUMBER() OVER (ORDER BY 1) - 1 as seq 
-         FROM {{ ref('stg_orders') }} 
-         LIMIT (SELECT DATEDIFF('day', min_date, max_date) + 1 FROM date_bounds))
+    SELECT 
+        UNNEST(generate_series(
+            (SELECT min_date FROM date_bounds),
+            (SELECT max_date FROM date_bounds),
+            INTERVAL '1' DAY
+        )) AS date
 ),
 
 date_metrics AS (
@@ -36,16 +37,18 @@ date_metrics AS (
 
 SELECT
     -- Data como chave
-    date as date_id,
+    ds.date AS date_id,
+    
     -- Componentes da data
-    EXTRACT(YEAR FROM date) as year,
-    EXTRACT(MONTH FROM date) as month,
-    EXTRACT(DAY FROM date) as day,
-    EXTRACT(DOW FROM date) as day_of_week,
-    EXTRACT(QUARTER FROM date) as quarter,
+    EXTRACT(YEAR FROM ds.date) AS year,
+    EXTRACT(MONTH FROM ds.date) AS month,
+    EXTRACT(DAY FROM ds.date) AS day,
+    EXTRACT(DOW FROM ds.date) AS day_of_week,
+    EXTRACT(QUARTER FROM ds.date) AS quarter,
+    
     -- Descritivos
-    TO_CHAR(date, 'Month') as month_name,
-    CASE EXTRACT(DOW FROM date)
+    strftime('%B', ds.date) AS month_name,  -- Usando strftime para o nome do mês
+    CASE EXTRACT(DOW FROM ds.date)
         WHEN 0 THEN 'Sunday'
         WHEN 1 THEN 'Monday'
         WHEN 2 THEN 'Tuesday'
@@ -53,20 +56,23 @@ SELECT
         WHEN 4 THEN 'Thursday'
         WHEN 5 THEN 'Friday'
         WHEN 6 THEN 'Saturday'
-    END as day_name,
+    END AS day_name,
+    
     -- Flags úteis
     CASE 
-        WHEN EXTRACT(DOW FROM date) IN (0, 6) THEN 'Weekend'
+        WHEN EXTRACT(DOW FROM ds.date) IN (0, 6) THEN 'Weekend'
         ELSE 'Weekday'
-    END as is_weekend,
+    END AS is_weekend,
+    
     CASE 
-        WHEN date = DATE_TRUNC('month', date) THEN 'First Day'
-        WHEN date = LAST_DAY(date) THEN 'Last Day'
+        WHEN ds.date = DATE_TRUNC('month', ds.date) THEN 'First Day'  -- Garantir que ds.date seja DATE
+        WHEN ds.date = LAST_DAY(ds.date) THEN 'Last Day'
         ELSE 'Other'
-    END as month_day_type,
+    END AS month_day_type,
+    
     -- Métricas diárias
-    COALESCE(dm.total_orders, 0) as total_orders,
-    COALESCE(dm.total_customers, 0) as total_customers,
-    COALESCE(dm.total_freight, 0) as total_freight
+    COALESCE(dm.total_orders, 0) AS total_orders,
+    COALESCE(dm.total_customers, 0) AS total_customers,
+    COALESCE(dm.total_freight, 0) AS total_freight
 FROM date_sequence ds
 LEFT JOIN date_metrics dm ON ds.date = dm.order_date

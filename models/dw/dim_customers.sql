@@ -48,8 +48,8 @@ SELECT
     -- Status calculado
     CASE 
         WHEN co.last_order_date IS NULL THEN 'New'
-        WHEN co.last_order_date <= DATEADD(MONTH, -6, CURRENT_DATE) THEN 'Churned'
-        WHEN co.last_order_date <= DATEADD(MONTH, -3, CURRENT_DATE) THEN 'At Risk'
+        WHEN co.last_order_date <= DATE_ADD(CURRENT_DATE, INTERVAL '-6 MONTH') THEN 'Churned'
+        WHEN co.last_order_date <= DATE_ADD(CURRENT_DATE, INTERVAL '-3 MONTH') THEN 'At Risk'
         ELSE 'Active'
     END as customer_status
 FROM {{ ref('stg_customers') }} c
