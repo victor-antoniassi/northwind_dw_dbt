@@ -1,0 +1,392 @@
+version: 2
+
+models:
+  - name: dim_customers
+    description: "Customer dimension table"
+    columns:
+      - name: customer_id
+        description: "Primary key - Customer ID from source"
+        tests:
+          - unique
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: company_name
+        description: "Customer company name"
+        tests:
+          - not_null
+      - name: contact_name
+        description: "Customer contact name"
+      - name: contact_title
+        description: "Customer contact title"
+      - name: address
+        description: "Customer address"
+      - name: city
+        description: "Customer city"
+      - name: region
+        description: "Customer region"
+      - name: postal_code
+        description: "Customer postal code"
+      - name: country
+        description: "Customer country"
+      - name: phone
+        description: "Customer phone number"
+      - name: fax
+        description: "Customer fax number"
+      - name: total_orders
+        description: "Total number of orders placed by customer"
+        tests:
+          - not_null
+      - name: first_order_date
+        description: "Date of customer's first order"
+      - name: last_order_date
+        description: "Date of customer's last order"
+      - name: customer_status
+        description: "Current status of customer (Active, At Risk, Churned)"
+        tests:
+          - not_null
+
+  - name: dim_products
+    description: "Product dimension table"
+    columns:
+      - name: product_id
+        description: "Primary key - Product ID from source"
+        tests:
+          - unique
+          - not_null
+          - relationships:
+              to: ref('stg_products')
+              field: product_id
+      - name: product_name
+        description: "Product name"
+        tests:
+          - not_null
+      - name: quantity_per_unit
+        description: "Quantity description per unit"
+      - name: current_price
+        description: "Current unit price of product"
+        tests:
+          - not_null
+      - name: units_in_stock
+        description: "Current units in stock"
+      - name: units_on_order
+        description: "Current units on order"
+      - name: reorder_level
+        description: "Level at which product should be reordered"
+      - name: discontinued
+        description: "Flag indicating if product is discontinued"
+      - name: category_id
+        description: "Foreign key to categories"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_categories')
+              field: category_id
+      - name: category_name
+        description: "Category name"
+        tests:
+          - not_null
+      - name: category_description
+        description: "Category description"
+      - name: supplier_id
+        description: "Foreign key to suppliers"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_suppliers')
+              field: supplier_id
+      - name: supplier_name
+        description: "Supplier company name"
+      - name: supplier_country
+        description: "Supplier country"
+      - name: stock_status
+        description: "Current stock status (In Stock, Low Stock, Out of Stock, Discontinued)"
+        tests:
+          - not_null
+
+  - name: dim_employees
+    description: "Employee dimension table"
+    columns:
+      - name: employee_id
+        description: "Primary key - Employee ID from source"
+        tests:
+          - unique
+          - not_null
+          - relationships:
+              to: ref('stg_employees')
+              field: employee_id
+      - name: employee_name
+        description: "Full name of employee"
+        tests:
+          - not_null
+      - name: title
+        description: "Employee job title"
+        tests:
+          - not_null
+      - name: title_of_courtesy
+        description: "Employee title of courtesy (Mr., Mrs., etc.)"
+      - name: birth_date
+        description: "Employee birth date"
+      - name: hire_date
+        description: "Date employee was hired"
+        tests:
+          - not_null
+      - name: age
+        description: "Current age of employee"
+      - name: years_of_service
+        description: "Years of service at company"
+      - name: address
+        description: "Employee address"
+      - name: city
+        description: "Employee city"
+      - name: region
+        description: "Employee region"
+      - name: postal_code
+        description: "Employee postal code"
+      - name: country
+        description: "Employee country"
+      - name: home_phone
+        description: "Employee home phone"
+      - name: extension
+        description: "Employee extension number"
+      - name: reports_to
+        description: "ID of employee's manager"
+      - name: manager_name
+        description: "Name of employee's manager"
+      - name: territories
+        description: "List of territories assigned to employee"
+      - name: regions
+        description: "List of regions assigned to employee"
+
+  - name: dim_dates
+    description: "Date dimension table"
+    columns:
+      - name: date_id
+        description: "Primary key - Date"
+        tests:
+          - unique
+          - not_null
+      - name: year
+        description: "Year component of date"
+        tests:
+          - not_null
+      - name: month
+        description: "Month component of date (1-12)"
+        tests:
+          - not_null
+      - name: day
+        description: "Day component of date"
+        tests:
+          - not_null
+      - name: quarter
+        description: "Quarter (1-4)"
+        tests:
+          - not_null
+      - name: month_name
+        description: "Name of month"
+        tests:
+          - not_null
+      - name: day_name
+        description: "Name of day (Monday-Sunday)"
+        tests:
+          - not_null
+      - name: is_weekend
+        description: "Flag indicating if date is weekend"
+        tests:
+          - not_null
+      - name: month_day_type
+        description: "Type of day in month (First Day, Last Day, Other)"
+        tests:
+          - not_null
+      - name: total_orders
+        description: "Total orders placed on this date"
+      - name: total_customers
+        description: "Total unique customers who placed orders on this date"
+      - name: total_freight
+        description: "Total freight charges for orders on this date"
+
+  - name: dim_geography
+    description: "Geography dimension table"
+    columns:
+      - name: geography_id
+        description: "Primary key - Surrogate key for location"
+        tests:
+          - unique
+          - not_null
+      - name: city
+        description: "City name"
+        tests:
+          - not_null
+      - name: region
+        description: "Region/State name"
+      - name: postal_code
+        description: "Postal code"
+      - name: country
+        description: "Country name"
+        tests:
+          - not_null
+      - name: total_customers
+        description: "Total number of customers at this location"
+      - name: total_employees
+        description: "Total number of employees at this location"
+      - name: total_suppliers
+        description: "Total number of suppliers at this location"
+      - name: location_types
+        description: "Types of entities at this location (Customer, Employee, Supplier)"
+        tests:
+          - not_null
+      - name: total_orders
+        description: "Total orders shipped to this location"
+      - name: total_freight
+        description: "Total freight charges for orders to this location"
+
+  - name: fct_orders
+    description: "Order fact table"
+    columns:
+      - name: order_id
+        description: "Primary key - Order ID from source"
+        tests:
+          - unique
+          - not_null
+          - relationships:
+              to: ref('stg_orders')
+              field: order_id
+      - name: customer_id
+        description: "Foreign key to dim_customers"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_customers')
+              field: customer_id
+      - name: employee_id
+        description: "Foreign key to dim_employees"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_employees')
+              field: employee_id
+      - name: order_date
+        description: "Date order was placed"
+        tests:
+          - not_null
+      - name: required_date
+        description: "Date order was required"
+      - name: shipped_date
+        description: "Date order was shipped"
+      - name: shipper_id
+        description: "Foreign key to shippers"
+        tests:
+          - relationships:
+              to: ref('stg_shippers')
+              field: shipper_id
+      - name: freight
+        description: "Shipping cost"
+      - name: ship_name
+        description: "Name to ship to"
+      - name: ship_address
+        description: "Shipping address"
+      - name: ship_city
+        description: "Shipping city"
+      - name: ship_region
+        description: "Shipping region"
+      - name: ship_postal_code
+        description: "Shipping postal code"
+      - name: ship_country
+        description: "Shipping country"
+      - name: total_items
+        description: "Number of different items in order"
+        tests:
+          - not_null
+      - name: total_quantity
+        description: "Total quantity of all items"
+        tests:
+          - not_null
+      - name: gross_amount
+        description: "Total amount before discounts"
+        tests:
+          - not_null
+      - name: net_amount
+        description: "Total amount after discounts"
+        tests:
+          - not_null
+      - name: total_discount
+        description: "Total discount amount"
+      - name: delivery_status
+        description: "Delivery status (On Time, Late, Not Shipped)"
+        tests:
+          - not_null
+      - name: days_to_ship
+        description: "Number of days between order and ship date"
+
+  - name: fct_order_details
+    description: "Order details fact table"
+    columns:
+      - name: order_id
+        description: "Foreign key to fct_orders"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('fct_orders')
+              field: order_id
+      - name: product_id
+        description: "Foreign key to dim_products"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_products')
+              field: product_id
+      - name: customer_id
+        description: "Foreign key to dim_customers"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_customers')
+              field: customer_id
+      - name: employee_id
+        description: "Foreign key to dim_employees"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_employees')
+              field: employee_id
+      - name: order_date
+        description: "Date order was placed"
+        tests:
+          - not_null
+      - name: shipper_id
+        description: "Foreign key to shippers"
+        tests:
+          - relationships:
+              to: ref('stg_shippers')
+              field: shipper_id
+      - name: sold_price
+        description: "Unit price at time of sale"
+        tests:
+          - not_null
+      - name: list_price
+        description: "Current list price of product"
+      - name: quantity
+        description: "Quantity ordered"
+        tests:
+          - not_null
+      - name: discount
+        description: "Discount percentage (0-1)"
+        tests:
+          - not_null
+      - name: gross_amount
+        description: "Amount before discount"
+        tests:
+          - not_null
+      - name: net_amount
+        description: "Amount after discount"
+        tests:
+          - not_null
+      - name: discount_amount
+        description: "Total discount amount"
+      - name: price_change_flag
+        description: "Indicates if selling price differs from list price"
+      - name: category_id
+        description: "Foreign key to categories"
+      - name: supplier_id
+        description: "Foreign key to suppliers"
