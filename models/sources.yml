@@ -1,0 +1,42 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: main
+    tables:
+      - name: orders
+        config:
+          external_location: "read_csv('./raw/orders.csv')"
+      - name: order_details
+        config:
+          external_location: "read_csv('./raw/order_details.csv')"
+      - name: products
+        config:
+          external_location: "read_csv('./raw/products.csv')"
+      - name: customers
+        config:
+          external_location: "read_csv('./raw/customers.csv')"
+      - name: employees
+        config:
+          external_location: "read_csv('./raw/employees.csv')"
+      - name: categories
+        config:
+          external_location: "read_csv('./raw/categories.csv')"
+      - name: suppliers
+        config:
+          external_location: "read_csv('./raw/suppliers.csv')"
+      - name: territories
+        config:
+          external_location: "read_csv('./raw/territories.csv')"
+      - name: shippers
+        config:
+          external_location: "read_csv('./raw/shippers.csv')"
+      - name: region
+        config:
+          external_location: "read_csv('./raw/region.csv')"
+      - name: employee_territories
+        config:
+          external_location: "read_csv('./raw/employee_territories.csv')"
+      - name: us_states
+        config:
+          external_location: "read_csv('./raw/us_states.csv')"

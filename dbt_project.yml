@@ -1,0 +1,28 @@
+name: 'northwind'
+version: '1.0.0'
+config-version: 2
+
+profile: 'northwind'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+
+target-path: "target"
+clean-targets:
+    - "target"
+    - "dbt_packages"
+
+models:
+  northwind:
+    +tags: ["northwind"]
+    stg:
+      +materialized: table
+      +schema: stg
+      +tags: ["stg"]
+    dw:
+      +materialized: table
+      +schema: dw
+      +tags: ["dw"]

@@ -1,0 +1,218 @@
+version: 2
+
+models:
+  - name: stg_orders
+    description: "Staged orders data"
+    columns:
+      - name: order_id
+        description: "Primary key of the orders table"
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: "Foreign key to customers table"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: employee_id
+        description: "Foreign key to employees table"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_employees')
+              field: employee_id
+      - name: order_date
+        description: "Date when order was placed"
+        tests:
+          - not_null
+
+  - name: stg_order_details
+    description: "Staged order details data"
+    columns:
+      - name: order_id
+        description: "Foreign key to orders table"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_orders')
+              field: order_id
+      - name: product_id
+        description: "Foreign key to products table"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_products')
+              field: product_id
+      - name: unit_price
+        description: "Price per unit at time of sale"
+        tests:
+          - not_null
+      - name: quantity
+        description: "Quantity ordered"
+        tests:
+          - not_null
+      - name: discount
+        description: "Discount percentage (0-1)"
+        tests:
+          - not_null
+
+  - name: stg_products
+    description: "Staged products data"
+    columns:
+      - name: product_id
+        description: "Primary key of products table"
+        tests:
+          - unique
+          - not_null
+      - name: supplier_id
+        description: "Foreign key to suppliers table"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_suppliers')
+              field: supplier_id
+      - name: category_id
+        description: "Foreign key to categories table"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_categories')
+              field: category_id
+
+  - name: stg_customers
+    description: "Staged customers data"
+    columns:
+      - name: customer_id
+        description: "Primary key of customers table"
+        tests:
+          - unique
+          - not_null
+      - name: company_name
+        description: "Customer company name"
+        tests:
+          - not_null
+
+  - name: stg_employees
+    description: "Staged employees data"
+    columns:
+      - name: employee_id
+        description: "Primary key of employees table"
+        tests:
+          - unique
+          - not_null
+      - name: first_name
+        description: "Employee first name"
+        tests:
+          - not_null
+      - name: last_name
+        description: "Employee last name"
+        tests:
+          - not_null
+
+  - name: stg_suppliers
+    description: "Staged suppliers data"
+    columns:
+      - name: supplier_id
+        description: "Primary key of suppliers table"
+        tests:
+          - unique
+          - not_null
+      - name: company_name
+        description: "Supplier company name"
+        tests:
+          - not_null
+
+  - name: stg_categories
+    description: "Staged categories data"
+    columns:
+      - name: category_id
+        description: "Primary key of categories table"
+        tests:
+          - unique
+          - not_null
+      - name: category_name
+        description: "Category name"
+        tests:
+          - not_null
+          - unique
+
+  - name: stg_shippers
+    description: "Staged shippers data"
+    columns:
+      - name: shipper_id
+        description: "Primary key of shippers table"
+        tests:
+          - unique
+          - not_null
+      - name: company_name
+        description: "Shipper company name"
+        tests:
+          - not_null
+
+  - name: stg_territories
+    description: "Staged territories data"
+    columns:
+      - name: territory_id
+        description: "Primary key of territories table"
+        tests:
+          - unique
+          - not_null
+      - name: region_id
+        description: "Foreign key to region table"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_region')
+              field: region_id
+
+  - name: stg_region
+    description: "Staged region data"
+    columns:
+      - name: region_id
+        description: "Primary key of region table"
+        tests:
+          - unique
+          - not_null
+      - name: region_description
+        description: "Region description"
+        tests:
+          - not_null
+
+  - name: stg_employee_territories
+    description: "Staged employee territories data"
+    columns:
+      - name: employee_id
+        description: "Foreign key to employees table"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_employees')
+              field: employee_id
+      - name: territory_id
+        description: "Foreign key to territories table"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_territories')
+              field: territory_id
+
+  - name: stg_us_states
+    description: "Staged US states data"
+    columns:
+      - name: state_id
+        description: "Primary key of US states table"
+        tests:
+          - unique
+          - not_null
+      - name: state_name
+        description: "State name"
+        tests:
+          - not_null
+          - unique
+      - name: state_abbr
+        description: "State abbreviation"
+        tests:
+          - not_null
+          - unique
